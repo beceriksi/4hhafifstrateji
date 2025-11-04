@@ -121,18 +121,19 @@ def main():
             if r: results.append(r)
     buys=[x for x in results if x["side"]=="BUY"]; sells=[x for x in results if x["side"]=="SELL"]
     whales=[x for x in results if x["whale"]]
-    if not (buys or sells or whales): return  # sessiz mod
     conf_avg=int(sum([x["conf"] for x in results if x["conf"]])/max(1,len(results)))
-    msg=[f"⚡ *MEXC Spot 1H / 4H Balina Taraması*\n⏱ {ts()}\nTarama: {len(syms)} coin | Süre: {int(time.time()-start)} sn\n📊 {note}\n🛡️ Güven Ort.: {conf_avg}/100"]
+    msg=[f"⚡ *MEXC Spot 1H / 4H Tarama Raporu*\n⏱ {ts()}\n📊 Tarama: {len(syms)} coin | Süre: {int(time.time()-start)} sn\n🛡️ Güven Ort.: {conf_avg}/100\n{note}"]
     if whales:
         msg.append("\n💰 *Balina Hacimleri (≥0.8M USD)*")
-        for w in sorted(whales,key=lambda x:x["turnover"],reverse=True)[:6]:
+        for w in sorted(whales,key=lambda x:x["turnover"],reverse=True)[:5]:
             tag="🟢 BUY" if w["whale_side"]=="BUY" else "🔴 SELL"
-            msg.append(f"- {w['symbol']} | {w['tf']} | {tag} | Hacim:{w['turnover']:.1f} USD | RSI:{w['rsi']:.1f}")
+            msg.append(f"- {w['symbol']} | {w['tf']} | {tag} | Hacim:{w['turnover']:.0f} USD")
     if buys or sells:
         msg.append("\n📈 *Sinyaller*")
-        if buys: msg.append("🟢 *BUY:*"); [msg.append(f"- {x['symbol']} | {x['tf']} | Güven:{x['conf']} | RSI:{x['rsi']:.1f}") for x in sorted(buys,key=lambda x:x['conf'],reverse=True)[:10]]
-        if sells: msg.append("🔴 *SELL:*"); [msg.append(f"- {x['symbol']} | {x['tf']} | Güven:{x['conf']} | RSI:{x['rsi']:.1f}") for x in sorted(sells,key=lambda x:x['conf'],reverse=True)[:10]]
+        if buys: msg.append("🟢 *BUY:*"); [msg.append(f"- {x['symbol']} | {x['tf']} | Güven:{x['conf']}") for x in sorted(buys,key=lambda x:x['conf'],reverse=True)[:10]]
+        if sells: msg.append("🔴 *SELL:*"); [msg.append(f"- {x['symbol']} | {x['tf']} | Güven:{x['conf']}") for x in sorted(sells,key=lambda x:x['conf'],reverse=True)[:10]]
+    else:
+        msg.append("\nℹ️ Şu an kriterlere uyan sinyal yok.")
     telegram("\n".join(msg))
 
 if __name__=="__main__": main()
